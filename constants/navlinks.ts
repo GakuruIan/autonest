@@ -1,11 +1,9 @@
 import {
   House,
-  ChartArea,
+  BarChart4,
   Users,
-  GraduationCap,
-  BookOpen,
+  Car,
   FileText,
-  ListChecks,
   Tags,
   Flag,
   MessageSquareText,
@@ -13,25 +11,28 @@ import {
   Activity,
   Settings,
   BellRing,
+  Wallet,
+  PackageSearch,
+  Store,
 } from "lucide-react";
 
 export const NavLinks = [
   {
-    label: "Main Main",
+    label: "Main",
     links: [
       {
         title: "Dashboard",
-        url: "/dashboard/admin",
+        url: "/admin",
         icon: House,
       },
       {
         title: "Analytics",
-        url: "/dashboard/admin/analytics",
-        icon: ChartArea,
+        url: "/admin/analytics",
+        icon: BarChart4,
       },
       {
         title: "Notifications",
-        url: "/dashboard/admin/notifications",
+        url: "/admin/notifications",
         icon: BellRing,
       },
     ],
@@ -40,45 +41,49 @@ export const NavLinks = [
     label: "User Management",
     links: [
       {
-        title: "Manage users",
-        url: "/dashboard/admin/users",
+        title: "Manage Users",
+        url: "/admin/users",
         icon: Users,
       },
-
       {
-        title: "Students",
-        url: "/dashboard/admin/users/students",
-        icon: GraduationCap,
-      },
-      {
-        title: "Roles and permissions",
-        url: "/dashboard/admin/users-roles",
-        icon: GraduationCap,
+        title: "Dealers & Sellers",
+        url: "/admin/dealers",
+        icon: Store,
       },
     ],
   },
   {
-    label: "Course Management",
+    label: "Vehicle Management",
     links: [
       {
-        title: "Course",
-        url: "/dashboard/admin/courses",
-        icon: BookOpen,
+        title: "All Listings",
+        url: "/admin/cars",
+        icon: Car,
       },
       {
-        title: "Assignments",
-        url: "/dashboard/admin/assignments",
+        title: "Pending Approvals",
+        url: "/admin/cars/pending",
+        icon: PackageSearch,
+      },
+      {
+        title: "Categories & Tags",
+        url: "/admin/categories",
+        icon: Tags,
+      },
+    ],
+  },
+  {
+    label: "Transactions",
+    links: [
+      {
+        title: "Orders & Purchases",
+        url: "/admin/orders",
         icon: FileText,
       },
       {
-        title: "Quizzes",
-        url: "/dashboard/admin/users/quizzes",
-        icon: ListChecks,
-      },
-      {
-        title: "Category & tags",
-        url: "/dashboard/admin/categories",
-        icon: Tags,
+        title: "Payments & Payouts",
+        url: "/admin/payments",
+        icon: Wallet,
       },
     ],
   },
@@ -86,13 +91,13 @@ export const NavLinks = [
     label: "Support",
     links: [
       {
-        title: "Feedback & reviews",
-        url: "/dashboard/admin/feedback",
+        title: "Feedback & Reviews",
+        url: "/admin/feedback",
         icon: MessageSquareText,
       },
       {
-        title: "Report & Flags",
-        url: "/dashboard/admin/reports",
+        title: "Reports & Flags",
+        url: "/admin/reports",
         icon: Flag,
       },
     ],
@@ -102,17 +107,17 @@ export const NavLinks = [
     links: [
       {
         title: "Settings",
-        url: "/dashboard/admin/settings",
+        url: "/admin/settings",
         icon: Settings,
       },
       {
         title: "Audit Logs",
-        url: "/dashboard/admin/audit-logs",
+        url: "/admin/audit-logs",
         icon: ScrollText,
       },
       {
-        title: "System status",
-        url: "/dashboard/admin/system-status",
+        title: "System Status",
+        url: "/admin/system-status",
         icon: Activity,
       },
     ],

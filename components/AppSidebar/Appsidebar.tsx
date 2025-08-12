@@ -21,34 +21,33 @@ import Link from "next/link";
 // links
 import { NavLinks } from "@/constants/navlinks";
 import { Separator } from "../ui/separator";
-import { ScrollArea } from "../ui/scroll-area";
 
 import Image from "next/image";
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   return (
-    <Sidebar collapsible="icon" {...props} variant="floating">
-      <SidebarHeader className="py-4 ">
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader className="py-3 border-b dark:border-b-neutral-600/40">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton>
-              <div className="relative size-8">
-                <Image src="/logo.svg" alt="logo" fill />
-              </div>
-              <p className="text-sm font-poppins">AutoNest</p>
+              {/* <div className="relative size-5 mr-2"></div> */}
+              <Image src="/logo.svg" alt="logo" width={18} height={18} />
+              <p className="dark:text-neutral-300 text-sm font-poppins ml-1.5">
+                AutoNest
+              </p>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <Separator />
       </SidebarHeader>
 
       <SidebarContent className="no-scrollbar">
         {NavLinks.map((menuitems) => (
           <SidebarGroup key={menuitems.label}>
-            <SidebarGroupLabel className="font-poppins-semibold text-sm  tracking-tight">
+            <SidebarGroupLabel className="font-poppins text-sm  tracking-wide">
               {menuitems.label}
             </SidebarGroupLabel>
-            <Separator />
+            <Separator className="mb-2" />
             <SidebarGroupContent>
               <SidebarMenu>
                 {menuitems.links.map((item) => (

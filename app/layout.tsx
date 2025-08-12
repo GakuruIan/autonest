@@ -44,8 +44,12 @@ export default function RootLayout({
         <body
           className={`${bebas_neue.variable} ${poppins.variable} ${rajdhani.variable} ${jura.className} antialiased`}
         >
-          <ThemeProvider>
-            <Navbar />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem={false}
+            storageKey="autonest-theme"
+          >
             {children}
           </ThemeProvider>
         </body>

@@ -28,12 +28,41 @@ interface props {
 
 const BasicInformation = ({ form }: props) => {
   return (
-    <div className="flex flex-col space-y-8 ">
+    <div className="flex flex-col space-y-6 ">
+      {/* category */}
+      <div className="grid gap-3 ">
+        <FormField
+          control={form.control}
+          name="brand"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="tracking-wider text-sm mb-1.5">
+                Car Brand
+              </FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select car brand" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="toyota">Toyota</SelectItem>
+                  <SelectItem value="nissan">Nissan</SelectItem>
+                  <SelectItem value="mazda">Mazda</SelectItem>
+                  <SelectItem value="honda">Honda</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       {/* car model */}
       <div className="grid gap-3">
         <FormField
           control={form.control}
-          name="password"
+          name="model"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="tracking-wider text-sm mb-1.5">
@@ -59,7 +88,7 @@ const BasicInformation = ({ form }: props) => {
       <div className="grid gap-3 ">
         <FormField
           control={form.control}
-          name="email"
+          name="category"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="tracking-wider text-sm mb-1.5">
@@ -88,7 +117,7 @@ const BasicInformation = ({ form }: props) => {
       <div className="grid gap-3">
         <FormField
           control={form.control}
-          name="password"
+          name="year"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="tracking-wider text-sm mb-1.5">
@@ -96,7 +125,7 @@ const BasicInformation = ({ form }: props) => {
               </FormLabel>
               <FormControl>
                 <Input
-                  id="carname"
+                  id="year"
                   type="text"
                   placeholder="e.g Toyota Camry"
                   autoComplete="off"
@@ -114,7 +143,7 @@ const BasicInformation = ({ form }: props) => {
       <div className="grid gap-3">
         <FormField
           control={form.control}
-          name="inStock"
+          name="in_stock"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center space-x-2">
               <FormControl>

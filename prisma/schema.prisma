@@ -14,8 +14,24 @@ datasource db {
 }
 
 enum Role {
+  super_admin
   admin
   user
+  manager
+}
+
+enum CarBrand {
+  toyota
+  mazda
+  nissan
+  honda
+}
+
+enum CarCategory {
+  sedan
+  suv
+  hatch_back
+  luxury
 }
 
 model User {
@@ -28,4 +44,65 @@ model User {
   verified  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  car       Car[]    @relation("UserCars")
+  cart      Cart?
+}
+
+model Car {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  brand       CarBrand
+  model       String
+  category    CarCategory
+  year        String
+  price       Int
+  thumbnailId String      @unique @db.ObjectId
+  thumbnail   Image?      @relation("CarThumbnail", fields: [thumbnailId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  specifications Specifications
+  photos         Image[]        @relation("CarPhotos")
+  description    String
+  features       String[]
+  in_stock       Boolean
+  rating         Float
+  ownerId        String         @db.ObjectId
+  owner          User           @relation("UserCars", fields: [ownerId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  cartItem       CartItem[]
+}
+
+model Image {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  url          String
+  fileId       String
+  carThumbnail Car?     @relation("CarThumbnail")
+  carPhotosId  String?  @db.ObjectId
+  carPhotos    Car?     @relation("CarPhotos", fields: [carPhotosId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model Cart {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String     @unique @db.ObjectId
+  user      User       @relation(fields: [userId], references: [id])
+  item      CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  cartId   String @db.ObjectId
+  cart     Cart   @relation(fields: [cartId], references: [id])
+  carId    String @db.ObjectId
+  car      Car    @relation(fields: [carId], references: [id])
+  quantity Int    @default(1)
+}
+
+type Specifications {
+  engine           String
+  transmission     String
+  fuel_type        String
+  mileage          String
+  seating_capacity Int
 }

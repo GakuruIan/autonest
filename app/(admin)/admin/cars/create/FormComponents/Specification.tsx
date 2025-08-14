@@ -27,12 +27,12 @@ interface props {
 const Specification = ({ form }: props) => {
   return (
     <div>
-      <div className="flex flex-col space-y-6 ">
-        {/* car model */}
+      <div className="flex flex-col space-y-6">
+        {/* car engine */}
         <div className="grid gap-3">
           <FormField
             control={form.control}
-            name="password"
+            name="engine"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="tracking-wider text-sm mb-1">
@@ -42,7 +42,7 @@ const Specification = ({ form }: props) => {
                   <Input
                     id="carengine"
                     type="text"
-                    placeholder="e.g "
+                    placeholder="e.g 2.0L Turbo"
                     autoComplete="off"
                     {...field}
                   />
@@ -58,11 +58,11 @@ const Specification = ({ form }: props) => {
         <div className="grid gap-3 ">
           <FormField
             control={form.control}
-            name="email"
+            name="transmission"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="tracking-wider text-sm mb-1.5">
-                  Car Category
+                  Car Transmission
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
@@ -89,7 +89,7 @@ const Specification = ({ form }: props) => {
         <div className="grid gap-3 ">
           <FormField
             control={form.control}
-            name="email"
+            name="fuel_type"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="tracking-wider text-sm mb-1.5">
@@ -121,7 +121,7 @@ const Specification = ({ form }: props) => {
         <div className="grid gap-3">
           <FormField
             control={form.control}
-            name="password"
+            name="mileage"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="tracking-wider text-sm mb-1.5">
@@ -147,7 +147,7 @@ const Specification = ({ form }: props) => {
         <div className="grid gap-3">
           <FormField
             control={form.control}
-            name="password"
+            name="seating_capacity"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="tracking-wider text-sm mb-1.5">

@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import Navbar from "./components/Navbar";
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { ReactQueryClientProvider } from "@/providers/ReactQueryProvider";
 
 const bebas_neue = Bebas_Neue({
   weight: "400",
@@ -40,20 +41,22 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${bebas_neue.variable} ${poppins.variable} ${rajdhani.variable} ${jura.className} antialiased`}
-        >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem={false}
-            storageKey="autonest-theme"
+      <ReactQueryClientProvider>
+        <html lang="en">
+          <body
+            className={`${bebas_neue.variable} ${poppins.variable} ${rajdhani.variable} ${jura.className} antialiased`}
           >
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem={false}
+              storageKey="autonest-theme"
+            >
+              {children}
+            </ThemeProvider>
+          </body>
+        </html>
+      </ReactQueryClientProvider>
     </ClerkProvider>
   );
 }

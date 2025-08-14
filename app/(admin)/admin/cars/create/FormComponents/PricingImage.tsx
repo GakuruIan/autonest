@@ -2,14 +2,6 @@ import React from "react";
 
 // components
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import {
   FormControl,
   FormField,
   FormItem,
@@ -27,12 +19,12 @@ interface props {
 const PricingImage = ({ form }: props) => {
   return (
     <div>
-      <div className="flex flex-col space-y-8 ">
+      <div className="flex flex-col space-y-6">
         {/* car price */}
         <div className="grid gap-3">
           <FormField
             control={form.control}
-            name="password"
+            name="price"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="tracking-wider text-sm mb-1.5">
@@ -40,7 +32,7 @@ const PricingImage = ({ form }: props) => {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    id="carname"
+                    id="price"
                     type="number"
                     placeholder="e.g 850,000"
                     autoComplete="off"
@@ -59,10 +51,10 @@ const PricingImage = ({ form }: props) => {
 
           <FileUpload
             form={form}
-            name="photo"
+            name="thumbnail"
             label="Choose a Car Thumbnail"
             placeholder="choose an image"
-            accept=".jpg,.jpeg"
+            accept=".jpg,.jpeg,.png"
           />
         </div>
 
@@ -72,10 +64,11 @@ const PricingImage = ({ form }: props) => {
 
           <FileUpload
             form={form}
-            name="photo"
+            name="photos"
             label="Choose a Car photos"
             placeholder="choose an image"
-            accept=".jpg,.jpeg"
+            accept=".jpg,.jpeg,.png"
+            multiple
           />
         </div>
       </div>

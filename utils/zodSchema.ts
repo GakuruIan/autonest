@@ -10,7 +10,7 @@ export const StepOneSchema = z.object({
     .max(30, "Car model cannot be more than 30 characters")
     .trim(),
   category: z.enum(
-    ["sedan", "suv", "hatch_back", "luxury"],
+    ["sedan", "suv", "hatchback", "luxury"],
     "Car category is required"
   ),
   year: z.string().min(1, "Car year of manufacture is required").trim(),

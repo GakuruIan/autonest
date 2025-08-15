@@ -14,9 +14,23 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
+
+// components
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import CarCard from "@/components/ui/CarCard";
+
+// fetch hook
+import { useFetchCars } from "@/hooks/queries/useFetchCars";
+import Loader from "@/components/ui/Loaders/Loader";
+
+import { Car } from "@prisma/client";
+
+type CarProps = Pick<Car, "id" | "brand" | "category" | "price" | "model"> & {
+  thumbnail: {
+    url: string;
+  };
+};
 
 const Page = () => {
   const searchSchema = z.object({
@@ -34,43 +48,19 @@ const Page = () => {
     },
   });
 
-  const cars = [
-    {
-      image: "https://images.unsplash.com/photo-1605369178370-19f0a3c16d9b",
-      name: "Corolla Altis",
-      brand: "Toyota",
-      category: "Sedan",
-      price: 18000,
-    },
-    {
-      image: "https://images.unsplash.com/photo-1617434778949-cd3e364a3e44",
-      name: "Civic Sport",
-      brand: "Honda",
-      category: "Sedan",
-      price: 22000,
-    },
-    {
-      image: "https://images.unsplash.com/photo-1610642053169-d5e47f2a1ecf",
-      name: "Model 3",
-      brand: "Tesla",
-      category: "Electric",
-      price: 35000,
-    },
-    {
-      image: "https://images.unsplash.com/photo-1622022046904-e2b9ff48853b",
-      name: "Mustang GT",
-      brand: "Ford",
-      category: "Coupe",
-      price: 42000,
-    },
-    {
-      image: "https://images.unsplash.com/photo-1583267746741-371cb60f7331",
-      name: "CX-5",
-      brand: "Mazda",
-      category: "SUV",
-      price: 27000,
-    },
-  ];
+  const { isLoading, data: cars, error } = useFetchCars();
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-72px)]">
+        <p className="dark:text-neutral-300 font-poppins">{error.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-6 px-2 md:px-0">
@@ -120,16 +110,19 @@ const Page = () => {
 
         {/* CAR    */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          {cars.map((car, index) => (
-            <CarCard
-              key={index}
-              name={car.name}
-              price={car.price}
-              category={car.category}
-              brand={car.brand}
-              image={car.image}
-            />
-          ))}
+          {cars?.map((car: CarProps) => {
+            return (
+              <CarCard
+                id={car.id}
+                key={car.id}
+                model={car.model}
+                price={car.price}
+                category={car.category}
+                brand={car.brand}
+                image={car.thumbnail.url}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

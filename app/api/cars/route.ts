@@ -12,7 +12,7 @@ import { FullCarSchema } from "@/utils/zodSchema";
 // database
 import { db } from "@/lib/prisma";
 
-async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const user = await currentUser();
   try {
     if (!user || user.role !== "admin") {
@@ -34,6 +34,15 @@ async function POST(req: NextRequest) {
         continue;
       }
 
+      if (key === "specifications") {
+        try {
+          rawData[key] = JSON.parse(value as string);
+        } catch {
+          rawData[key] = value;
+        }
+        continue;
+      }
+
       if (key.endsWith("[]")) {
         const trimmedKey = key.replace("[]", "");
         if (!rawData[trimmedKey]) rawData[trimmedKey] = [];
@@ -42,8 +51,6 @@ async function POST(req: NextRequest) {
         rawData[key] = value;
       }
     }
-
-    console.log(rawData);
 
     let thumbnailUploadResult;
     let uploadedPhotos: { url: string; fileId: string }[] = [];
@@ -108,30 +115,27 @@ async function POST(req: NextRequest) {
 
     const { thumbnail, photos, ...dataForDb } = validatedData;
 
-    await db.car.create({
-      data: {
-        ...dataForDb,
-        thumbnail: {
-          create: thumbnailUploadResult,
-        },
-        photos: {
-          create: uploadedPhotos,
-        },
-        specifications: {
-          engine: "df",
-          transmission: "d",
-          fuel_type: "df",
-          mileage: "df",
-          seating_capacity: 2,
-        },
-        rating: 2.2,
-        owner: {
-          connect: {
-            clerkId: user.clerkId,
-          },
-        },
-      },
-    });
+    console.log(dataForDb);
+
+    // await db.car.create({
+    //   data: {
+    //     ...dataForDb,
+    //     thumbnail: {
+    //       create:{
+    //         url:thumbnailUploadResult.fileId,
+    //         fileId:thumbnailUploadResult.fileId
+    //       },
+    //     },
+    //     photos: {
+    //       create: uploadedPhotos,
+    //     },
+    //     owner: {
+    //       connect: {
+    //         clerkId: user.clerkId,
+    //       },
+    //     },
+    //   },
+    // });
 
     return NextResponse.json(
       { message: "Car created successfully" },
@@ -171,5 +175,29 @@ async function POST(req: NextRequest) {
       { error: "Internal server error" },
       { status: 500 }
     );
+  }
+}
+
+export async function GET() {
+  try {
+    const cars = await db.car.findMany({
+      select: {
+        price: true,
+        model: true,
+        brand: true,
+        category: true,
+        id: true,
+        thumbnail: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(cars);
+  } catch (error) {
+    console.log(`[SERVER ERROR]: ${error}`);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

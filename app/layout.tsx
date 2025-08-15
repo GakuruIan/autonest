@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Rajdhani, Poppins, Jura } from "next/font/google";
 import "./globals.css";
+// theme provider
 import { ThemeProvider } from "@/providers/theme-provider";
-import Navbar from "./components/Navbar";
 
+// auth provider
 import { ClerkProvider } from "@clerk/nextjs";
+
+// react query provider
 import { ReactQueryClientProvider } from "@/providers/ReactQueryProvider";
+
+// toaster
+import { Toaster } from "@/components/ui/sonner";
 
 const bebas_neue = Bebas_Neue({
   weight: "400",
@@ -53,6 +59,7 @@ export default function RootLayout({
               storageKey="autonest-theme"
             >
               {children}
+              <Toaster richColors={true} position="top-center" />
             </ThemeProvider>
           </body>
         </html>

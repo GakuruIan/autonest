@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import React from "react";
 
@@ -13,16 +14,47 @@ import {
 } from "@/components/ui/table";
 import { Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/Loaders/Loader";
 
-// cars
+// fetch cart hook
+import { useFetchCart } from "@/hooks/queries/useFetchCart";
+
+// delete mutation function
+import { useRemoveFromCart } from "@/hooks/mutations/useRemoveFromCart";
+import { toast } from "sonner";
 
 const Page = () => {
-  const cars = [1];
+  const { isLoading, data: cart, error } = useFetchCart();
+
+  const removeItem = useRemoveFromCart();
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  const handleRemoveItem = async (id: string) => {
+    try {
+      const sucess = await removeItem.mutateAsync(id);
+
+      if (sucess) {
+        toast.success("Success", {
+          description: "Car removed from cart successfully",
+        });
+      }
+    } catch (error) {
+      toast.error("Error", {
+        description: `${error?.message}`,
+      });
+      console.error(error);
+    }
+  };
+
+  console.log(cart);
   return (
     <div className="flex flex-col space-y-6 container mx-auto py-6 px-2 md:px-0">
       <header className="">
         <h2 className="text-3xl md:text-5xl  dark:text-white font-jura mb-3">
-          Your cart
+          Your cart ({cart.totalItems})
         </h2>
       </header>
 
@@ -34,26 +66,33 @@ const Page = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Image</TableHead>
-                <TableHead>Car name</TableHead>
+                <TableHead>Model</TableHead>
                 <TableHead>Car brand</TableHead>
                 <TableHead>Car category</TableHead>
                 <TableHead className="">Price</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cars.map((car) => (
-                <TableRow key={car}>
+              {cart.items?.map((item) => (
+                <TableRow key={item.car.id}>
                   <TableCell>
                     <div className="relative size-24 overflow-hidden rounded-md">
-                      <Image src="/bmw2.jpg" alt="car name" fill />
+                      <Image
+                        src={item.car?.thumbnail.url}
+                        alt="car name"
+                        fill
+                      />
                     </div>
                   </TableCell>
-                  <TableCell>Car name</TableCell>
-                  <TableCell>Car brand</TableCell>
-                  <TableCell>car price</TableCell>
-                  <TableCell>car category</TableCell>
+                  <TableCell>{item.car?.model}</TableCell>
+                  <TableCell>{item.car?.brand}</TableCell>
+                  <TableCell>{item.car?.category}</TableCell>
+                  <TableCell>{item.car?.price}</TableCell>
                   <TableCell className="text-right">
-                    <button className="flex items-center gap-x-1 text-rose-500 font-medium justify-center p-1.5 rounded-sm hover:underline transition-colors cursor-pointer">
+                    <button
+                      onClick={() => handleRemoveItem(item.id)}
+                      className="flex items-center gap-x-1 text-rose-500 font-medium justify-center p-1.5 rounded-sm hover:underline transition-colors cursor-pointer"
+                    >
                       <Trash size={16} />
                       Remove
                     </button>

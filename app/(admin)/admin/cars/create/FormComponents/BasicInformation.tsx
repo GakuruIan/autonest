@@ -103,7 +103,7 @@ const BasicInformation = ({ form }: props) => {
                 <SelectContent>
                   <SelectItem value="sedan">Sedan</SelectItem>
                   <SelectItem value="suv">SUV</SelectItem>
-                  <SelectItem value="hatch_back">HatchBack</SelectItem>
+                  <SelectItem value="hatchback">HatchBack</SelectItem>
                   <SelectItem value="luxury">Luxury</SelectItem>
                 </SelectContent>
               </Select>

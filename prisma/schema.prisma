@@ -30,7 +30,7 @@ enum CarBrand {
 enum CarCategory {
   sedan
   suv
-  hatch_back
+  hatchback
   luxury
 }
 
@@ -91,12 +91,15 @@ model Cart {
 }
 
 model CartItem {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  cartId   String @db.ObjectId
-  cart     Cart   @relation(fields: [cartId], references: [id])
-  carId    String @db.ObjectId
-  car      Car    @relation(fields: [carId], references: [id])
-  quantity Int    @default(1)
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  cartId   String  @db.ObjectId
+  cart     Cart    @relation(fields: [cartId], references: [id])
+  carId    String  @db.ObjectId
+  car      Car     @relation(fields: [carId], references: [id])
+  quantity Int     @default(1)
+  sold     Boolean @default(false)
+
+  @@unique([cartId, carId])
 }
 
 type Specifications {

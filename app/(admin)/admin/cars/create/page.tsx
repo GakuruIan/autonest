@@ -160,30 +160,65 @@ const Page = () => {
     values: CarFormStepData
   ) => {
     setIsLoading(true);
+
     // TODO :Finish this submit handler
     try {
-      // const {
-      //   model,
-      //   brand,
-      //   category,
-      //   description,
-      //   features,
-      //   fuel_type,
-      //   engine,
-      //   year,
-      //   thumbnail,
-      //   seating_capacity,
-      //   rating,
-      //   photos,
-      //   in_stock,
-      //   mileage,
-      //   transmission,
-      //   price,
-      // } = values;
+      const {
+        model,
+        brand,
+        category,
+        description,
+        features,
+        fuel_type,
+        engine,
+        year,
+        thumbnail,
+        seating_capacity,
+        rating,
+        photos,
+        in_stock,
+        mileage,
+        transmission,
+        price,
+      } = values;
+
+      const carObject = {
+        brand,
+        model,
+        year: Number(year),
+        price: Number(price),
+        category,
+        photos,
+        thumbnail,
+        specifications: {
+          engine,
+          transmission,
+          fuelType: fuel_type,
+          mileage,
+          seatingCapacity: Number(seating_capacity),
+        },
+        features,
+        description,
+        in_stock: in_stock,
+        rating: Number(rating),
+      };
 
       const formData = new FormData();
+      Object.entries(carObject).forEach(([key, value]) => {
+        if (key === "photos") {
+          (value as (File | string)[]).forEach((file) => {
+            if (file instanceof File) {
+              formData.append("photos", file);
+            }
+          });
+        } else if (key === "thumbnail" && thumbnail instanceof File) {
+          formData.append("thumbnail", thumbnail);
+        } else {
+          formData.append(key, JSON.stringify(value));
+        }
+      });
 
-      //  await createCarMutation.mutateAsync(values)
+      await createCarMutation.mutateAsync(formData);
     } catch (error) {
     } finally {
       setIsLoading(false);

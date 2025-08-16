@@ -4,6 +4,13 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar/Appsidebar";
 import Topbar from "@/components/Topbar/Topbar";
 
+/*
+TODO:
+  Add Car editting and deleting
+  add admin route protection
+  add checkout and stripe payment
+*/
+
 const layout = ({
   children,
 }: Readonly<{

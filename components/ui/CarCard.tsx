@@ -43,7 +43,7 @@ const CarCard: React.FC<props> = ({
           <p className="text-sm dark:text-neutral-300">{price}</p>
         </div>
         <p className="text-sm text-gray-500 dark:text-neutral-300">
-          {brand} • {category}
+          {brand} • <Link href={`/cars?category=${category}`}>{category}</Link>
         </p>
       </div>
 

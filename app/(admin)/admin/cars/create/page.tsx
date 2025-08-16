@@ -110,7 +110,7 @@ const Page = () => {
       in_stock: false,
       features: [] as string[],
       description: "",
-      rating: 0,
+      rating: "",
       price: "",
       engine: "",
       seating_capacity: "",
@@ -120,7 +120,8 @@ const Page = () => {
     },
   });
 
-  const handleNext = async () => {
+  const handleNext = async (e: React.FormEvent) => {
+    e.preventDefault();
     const currentStepNumber = currentStep + 1;
 
     try {
@@ -139,13 +140,7 @@ const Page = () => {
       }
     } catch (error) {
       console.error("Step validation error:", error);
-
-      const isValid = await form.trigger();
-      if (isValid && currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        toast.error("Please fix the errors before proceeding");
-      }
+      toast.error("Something went wrong during validation");
     }
   };
 
@@ -157,75 +152,56 @@ const Page = () => {
   };
 
   const onSubmit: SubmitHandler<CarFormStepData> = async (
-    values: CarFormStepData
+    values: CarSchema
   ) => {
     setIsLoading(true);
 
-    // TODO :Finish this submit handler
     try {
-      const {
-        model,
-        brand,
-        category,
-        description,
-        features,
-        fuel_type,
-        engine,
-        year,
-        thumbnail,
-        seating_capacity,
-        rating,
-        photos,
-        in_stock,
-        mileage,
-        transmission,
-        price,
-      } = values;
-
-      const carObject = {
-        brand,
-        model,
-        year: Number(year),
-        price: Number(price),
-        category,
-        photos,
-        thumbnail,
-        specifications: {
-          engine,
-          transmission,
-          fuelType: fuel_type,
-          mileage,
-          seatingCapacity: Number(seating_capacity),
-        },
-        features,
-        description,
-        in_stock: in_stock,
-        rating: Number(rating),
-      };
-
       const formData = new FormData();
-      Object.entries(carObject).forEach(([key, value]) => {
-        if (key === "photos") {
-          (value as (File | string)[]).forEach((file) => {
-            if (file instanceof File) {
-              formData.append("photos", file);
-            }
-          });
-        } else if (key === "thumbnail" && thumbnail instanceof File) {
-          formData.append("thumbnail", thumbnail);
-        } else {
-          formData.append(key, JSON.stringify(value));
+
+      formData.append("brand", values.brand);
+      formData.append("model", values.model);
+      formData.append("category", values.category);
+      formData.append("year", values.year);
+      formData.append("price", values.price.toString());
+      formData.append("description", values.description);
+      formData.append("in_stock", values.in_stock.toString());
+      formData.append("rating", values.rating.toString());
+
+      const specifications = {
+        engine: values.engine,
+        transmission: values.transmission,
+        fuel_type: values.fuel_type,
+        mileage: values.mileage,
+        seating_capacity: parseInt(values.seating_capacity),
+      };
+      formData.append("specifications", JSON.stringify(specifications));
+
+      formData.append("features", JSON.stringify(values.features));
+
+      // Files for thumbnail and photos
+      if (values.thumbnail instanceof File) {
+        formData.append("thumbnail", values.thumbnail);
+      }
+
+      values.photos.forEach((photo: File) => {
+        if (photo instanceof File) {
+          formData.append("photos", photo);
         }
       });
 
       await createCarMutation.mutateAsync(formData);
+
+      toast.success("Success", { description: "Car added successfully" });
     } catch (error) {
+      console.log(error);
+      toast.error("Error", { description: "Could not add car" });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const isLastStep = currentStep === steps.length - 1;
+  const isReviewStep = currentStep === 4;
 
   if (!isLoaded) {
     return <Loader />;
@@ -280,7 +256,7 @@ const Page = () => {
                 </Button>
               )}
 
-              {isLastStep ? (
+              {isReviewStep ? (
                 <Button
                   type="submit"
                   className="flex justify-end"

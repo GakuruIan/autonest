@@ -32,7 +32,9 @@ type CarProps = Pick<Car, "id" | "brand" | "category" | "price" | "model"> & {
   };
 };
 
-const Page = () => {
+const Page = ({ searchParams }: { searchParams: { category?: string } }) => {
+  const category = searchParams.category;
+
   const searchSchema = z.object({
     search_term: z
       .string()
@@ -48,7 +50,7 @@ const Page = () => {
     },
   });
 
-  const { isLoading, data: cars, error } = useFetchCars();
+  const { isLoading, data: cars, error } = useFetchCars(category);
 
   if (isLoading) {
     return <Loader />;

@@ -105,7 +105,7 @@ const Specification = ({ form }: props) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="cvt">Petrol</SelectItem>
+                    <SelectItem value="petrol">Petrol</SelectItem>
                     <SelectItem value="diesel">Diesel</SelectItem>
                     <SelectItem value="hybrid">Hybrid</SelectItem>
                     <SelectItem value="electric"> Electric</SelectItem>
@@ -143,7 +143,7 @@ const Specification = ({ form }: props) => {
           />
         </div>
 
-        {/* Mileage */}
+        {/* seating capacity */}
         <div className="grid gap-3">
           <FormField
             control={form.control}

@@ -17,6 +17,8 @@ export const createCar = async (data: FormData): Promise<void> => {
     if (!res.data?.success) {
       throw new Error(res.data?.error || "Failed to create car");
     }
+
+    return res.data;
   } catch (err) {
     if (err instanceof Error) {
       console.error("Create car error:", err.message);
@@ -26,9 +28,11 @@ export const createCar = async (data: FormData): Promise<void> => {
   }
 };
 
-export const FetchCars = async () => {
+export const FetchCars = async (category?: string) => {
   try {
-    const res = await api.get("/cars");
+    const res = await api.get("/cars", {
+      params: category ? { category } : {},
+    });
 
     return res.data;
   } catch (err) {
@@ -48,6 +52,20 @@ export const FetchCar = async (id: string | undefined) => {
   } catch (err) {
     if (err instanceof Error) {
       console.log("Fetch cars error:", err.message);
+      throw err;
+    }
+    throw new Error("Unknown error occurred while creating car");
+  }
+};
+
+export const FetchFeatured = async () => {
+  try {
+    const res = await api.get(`/cars/featured`);
+
+    return res.data;
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("Fetching featured cars error:", err.message);
       throw err;
     }
     throw new Error("Unknown error occurred while creating car");

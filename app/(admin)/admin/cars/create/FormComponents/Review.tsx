@@ -1,11 +1,6 @@
+import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 import React from "react";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 interface props {
   form: any;
@@ -13,57 +8,162 @@ interface props {
 
 const Review = ({ form }: props) => {
   return (
-    <div>
-      <Accordion
-        type="single"
-        collapsible
-        className="w-full"
-        defaultValue="item-1"
-      >
-        <AccordionItem value="item-1">
-          <AccordionTrigger>Product Information</AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-4 text-balance">
-            <p>
-              Our flagship product combines cutting-edge technology with sleek
-              design. Built with premium materials, it offers unparalleled
-              performance and reliability.
+    <div className="space-y-3">
+      <div className="">
+        <h6 className="text-2xl dark:text-neutral-200 mb-2.5">
+          Car Basic information
+        </h6>
+
+        <div className="space-y-3">
+          {/* model */}
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Model</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("model")}
             </p>
-            <p>
-              Key features include advanced processing capabilities, and an
-              intuitive user interface designed for both beginners and experts.
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Brand</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("brand")}
             </p>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="item-2">
-          <AccordionTrigger>Shipping Details</AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-4 text-balance">
-            <p>
-              We offer worldwide shipping through trusted courier partners.
-              Standard delivery takes 3-5 business days, while express shipping
-              ensures delivery within 1-2 business days.
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Category</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("category")}
             </p>
-            <p>
-              All orders are carefully packaged and fully insured. Track your
-              shipment in real-time through our dedicated tracking portal.
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Car year of manufacture</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("year")}
             </p>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="item-3">
-          <AccordionTrigger>Return Policy</AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-4 text-balance">
-            <p>
-              We stand behind our products with a comprehensive 30-day return
-              policy. If you&apos;re not completely satisfied, simply return the
-              item in its original condition.
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 text-lg">In stock</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("in_stock")}
             </p>
-            <p>
-              Our hassle-free return process includes free return shipping and
-              full refunds processed within 48 hours of receiving the returned
-              item.
+          </div>
+        </div>
+      </div>
+
+      {/* car images */}
+      <div className="">
+        <h6 className="text-2xl dark:text-neutral-200">Car Photos</h6>
+
+        {form.getValues("thumbnail") ? (
+          <div className="relative size-32">
+            <Image
+              src={
+                form.getValues("thumbnail") instanceof File
+                  ? URL.createObjectURL(form.getValues("thumbnail"))
+                  : form.getValues("thumbnail")
+              }
+              alt="Car preview"
+              className="object-cover w-full h-full rounded-lg shadow"
+              fill
+              onLoad={(e) => {
+                if (form.getValues("thumbnail") instanceof File) {
+                  URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                }
+              }}
+            />
+          </div>
+        ) : (
+          <p className="text-neutral-500">No photo uploaded</p>
+        )}
+
+        <div className="flex flex-wrap gap-4 mt-3">
+          {form.getValues("photos")?.length > 0 ? (
+            form.getValues("photos").map((file: File, idx: number) => {
+              const previewUrl = URL.createObjectURL(file);
+              return (
+                <div key={idx} className="relative size-24">
+                  <Image
+                    src={previewUrl}
+                    alt={`Car ${idx + 1}`}
+                    fill
+                    className="object-cover w-full h-full rounded-lg shadow"
+                    onLoad={() => URL.revokeObjectURL(previewUrl)} // cleanup
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-neutral-500">No photos uploaded</p>
+          )}
+        </div>
+      </div>
+
+      <div className="">
+        <h6 className="text-2xl dark:text-neutral-200 mb-2.5">
+          Car Specifications
+        </h6>
+
+        <div className="space-y-3">
+          {/* model */}
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Car engine</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("engine")}
             </p>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Transmission</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("transmission")}
+            </p>
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Fuel type</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("fuel_type")}
+            </p>
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 ">Mileage</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("mileage")}
+            </p>
+          </div>
+
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 text-lg">Seating capacity</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("seating_capacity")}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="">
+        <h6 className="text-2xl dark:text-neutral-200 mb-2.5">Car Features</h6>
+
+        <div className="space-y-3">
+          <div className="inline-flex items-center justify-between w-full  gap-x-4">
+            <p className="dark:text-neutral-300 text-lg">Car Rating</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("rating")}
+            </p>
+          </div>
+
+          <div className=" w-full  gap-x-4">
+            <p className="dark:text-neutral-300 text-lg">Description</p>
+            <p className="dark:text-neutral-300 text-base">
+              {form.getValues("description")}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -29,7 +29,7 @@ interface props {
 const BasicInformation = ({ form }: props) => {
   return (
     <div className="flex flex-col space-y-6 ">
-      {/* category */}
+      {/* brand */}
       <div className="grid gap-3 ">
         <FormField
           control={form.control}
@@ -127,7 +127,7 @@ const BasicInformation = ({ form }: props) => {
                 <Input
                   id="year"
                   type="text"
-                  placeholder="e.g Toyota Camry"
+                  placeholder="e.g 2014"
                   autoComplete="off"
                   {...field}
                 />

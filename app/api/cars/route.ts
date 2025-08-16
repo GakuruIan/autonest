@@ -7,10 +7,11 @@ import { currentUser } from "@/lib/current-user";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
 // zod schema
-import { FullCarSchema } from "@/utils/zodSchema";
+import { PrismaCarSchema } from "@/utils/zodSchema";
 
 // database
 import { db } from "@/lib/prisma";
+import { $Enums } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const user = await currentUser();
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const rawData: Record<string, any> = {};
+    const photosArray: File[] = [];
 
     for (const [key, value] of formData.entries()) {
       if (key === "thumbnail") {
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (key === "photos") {
-        rawData[key] = value;
+        photosArray.push(value as File);
         continue;
       }
 
@@ -38,19 +40,40 @@ export async function POST(req: NextRequest) {
         try {
           rawData[key] = JSON.parse(value as string);
         } catch {
-          rawData[key] = value;
+          return NextResponse.json(
+            { error: "Invalid specifications format" },
+            { status: 400 }
+          );
         }
         continue;
       }
 
-      if (key.endsWith("[]")) {
-        const trimmedKey = key.replace("[]", "");
-        if (!rawData[trimmedKey]) rawData[trimmedKey] = [];
-        rawData[trimmedKey].push(value);
-      } else {
-        rawData[key] = value;
+      if (key === "features") {
+        try {
+          rawData[key] = JSON.parse(value as string);
+        } catch {
+          return NextResponse.json(
+            { error: "Invalid features format" },
+            { status: 400 }
+          );
+        }
+        continue;
       }
+
+      if (key === "in_stock") {
+        rawData[key] = value === "true";
+        continue;
+      }
+
+      if (key === "price" || key === "rating") {
+        rawData[key] = Number(value);
+        continue;
+      }
+
+      rawData[key] = value;
     }
+
+    rawData.photos = photosArray;
 
     let thumbnailUploadResult;
     let uploadedPhotos: { url: string; fileId: string }[] = [];
@@ -61,7 +84,9 @@ export async function POST(req: NextRequest) {
         folder: `autonest/cars/thumbnail`,
         resource_type: "image",
       });
+
       const results = Array.isArray(result) ? result[0] : result;
+
       thumbnailUploadResult = {
         url: results.secure_url,
         fileId: results.public_id,
@@ -111,36 +136,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const validatedData = FullCarSchema.parse(rawData);
+    const validatedData = PrismaCarSchema.parse(rawData);
 
     const { thumbnail, photos, ...dataForDb } = validatedData;
 
-    console.log(dataForDb);
+    await db.car.create({
+      data: {
+        ...dataForDb,
+        thumbnail: {
+          create: {
+            url: thumbnailUploadResult.url,
+            fileId: thumbnailUploadResult.fileId,
+          },
+        },
+        photos: {
+          create: uploadedPhotos,
+        },
+        owner: {
+          connect: {
+            clerkId: user.clerkId,
+          },
+        },
+      },
+    });
 
-    // await db.car.create({
-    //   data: {
-    //     ...dataForDb,
-    //     thumbnail: {
-    //       create:{
-    //         url:thumbnailUploadResult.fileId,
-    //         fileId:thumbnailUploadResult.fileId
-    //       },
-    //     },
-    //     photos: {
-    //       create: uploadedPhotos,
-    //     },
-    //     owner: {
-    //       connect: {
-    //         clerkId: user.clerkId,
-    //       },
-    //     },
-    //   },
-    // });
-
-    return NextResponse.json(
-      { message: "Car created successfully" },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {
     console.log("Error creating Car:", error);
 
@@ -178,9 +198,15 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const searchParams = req.nextUrl.searchParams;
+    const category = searchParams.get("category") || undefined;
+
     const cars = await db.car.findMany({
+      where: {
+        category: category ? (category as $Enums.CarCategory) : {},
+      },
       select: {
         price: true,
         model: true,

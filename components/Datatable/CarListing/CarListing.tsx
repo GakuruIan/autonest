@@ -1,24 +1,27 @@
+"use client";
 import React from "react";
 
-import { columns, Payment } from "./Columns";
+import { columns, CarProps } from "./Columns";
 
 // data table
 import { DataTable } from "./data-table";
 
-async function getData(): Promise<Payment[]> {
-  return [
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-    },
-  ];
-}
+import { useFetchCars } from "@/hooks/queries/useFetchCars";
+
+import Spinner from "@/components/ui/Loaders/Spinner";
 
 const CarListing = () => {
-  const data = getData();
-  return <DataTable columns={columns} data={data} />;
+  const { data: cars, isLoading } = useFetchCars();
+
+  if (isLoading) {
+    return (
+      <div className="h-44 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  return <DataTable columns={columns} data={cars} />;
 };
 
 export default CarListing;

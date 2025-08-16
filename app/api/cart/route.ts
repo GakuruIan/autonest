@@ -91,6 +91,7 @@ export async function GET() {
           userId: user.id,
           items: [],
           totalItems: 0,
+          totalPrice: 0,
           createdAt: null,
           updatedAt: null,
         });
@@ -99,11 +100,17 @@ export async function GET() {
 
     const totalItems = cart.item.reduce((sum, item) => sum + item.quantity, 0);
 
+    const totalPrice = cart.item.reduce(
+      (total, item) => total + item.quantity * item.car.price,
+      0
+    );
+
     return NextResponse.json({
       id: cart.id,
       userId: cart.userId,
       items: cart.item,
       totalItems,
+      totalPrice,
     });
   } catch (error) {
     console.log(`[CART ERROR]: ${error}`);

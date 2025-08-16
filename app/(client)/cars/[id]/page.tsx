@@ -51,6 +51,8 @@ const CarDetails = () => {
     }
   };
 
+  console.log(car);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 ">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -61,15 +63,15 @@ const CarDetails = () => {
           </div>
 
           <div className="mt-4 flex gap-3 overflow-x-auto">
-            {carImages.map((img, idx) => (
+            {car.photos.map((img) => (
               <div
                 className="relative w-24 h-16 cursor-pointer"
-                key={idx}
-                onClick={() => setSelectedImage(img)}
+                key={img.id}
+                onClick={() => setSelectedImage(img.url)}
               >
                 <Image
-                  src={img}
-                  alt={`Thumbnail ${idx + 1}`}
+                  src={img?.url}
+                  alt={`Thumbnail ${img.id}`}
                   fill
                   className={`border-2 rounded-md transition ${
                     selectedImage === img

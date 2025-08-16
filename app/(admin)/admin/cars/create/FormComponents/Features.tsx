@@ -24,6 +24,7 @@ interface props {
 interface Features {
   id: string;
   name: string;
+  value: string;
 }
 
 // animation
@@ -36,10 +37,10 @@ const itemVariants = {
 
 const Features = ({ form }: props) => {
   const [features, setFeatures] = useState<Features[]>([
-    { id: "1", name: "Air Conditioning" },
-    { id: "2", name: "Power Steering" },
-    { id: "3", name: "ABS" },
-    { id: "4", name: "Airbags" },
+    { id: "1", value: "Air Conditioning", name: "Air Conditioning" },
+    { id: "2", value: "Power Steering", name: "Power Steering" },
+    { id: "3", value: "ABS", name: "ABS" },
+    { id: "4", value: "Airbags", name: "Airbags" },
   ]);
 
   return (
@@ -58,7 +59,7 @@ const Features = ({ form }: props) => {
                   <Input
                     id="carengine"
                     type="text"
-                    placeholder="e.g 15 km/l"
+                    placeholder="e.g 3"
                     autoComplete="off"
                     {...field}
                   />
@@ -111,7 +112,7 @@ const Features = ({ form }: props) => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <AnimatePresence>
                       {features.map((feature, index) => {
-                        const isChecked = field.value?.includes(feature.id);
+                        const isChecked = field.value?.includes(feature.value);
                         return (
                           <motion.div
                             key={feature.id}
@@ -128,9 +129,9 @@ const Features = ({ form }: props) => {
                                   checked={isChecked}
                                   onCheckedChange={(checked) => {
                                     const updatedValues = checked
-                                      ? [...(field.value || []), feature.id]
+                                      ? [...(field.value || []), feature.value]
                                       : (field.value || []).filter(
-                                          (val: string) => val !== feature.id
+                                          (val: string) => val !== feature.value
                                         );
 
                                     field.onChange(updatedValues);

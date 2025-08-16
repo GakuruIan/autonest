@@ -24,6 +24,7 @@ import { useRemoveFromCart } from "@/hooks/mutations/useRemoveFromCart";
 import { toast } from "sonner";
 
 const Page = () => {
+  const fee = 100000;
   const { isLoading, data: cart, error } = useFetchCart();
 
   const removeItem = useRemoveFromCart();
@@ -34,9 +35,9 @@ const Page = () => {
 
   const handleRemoveItem = async (id: string) => {
     try {
-      const sucess = await removeItem.mutateAsync(id);
+      const success = await removeItem.mutateAsync(id);
 
-      if (sucess) {
+      if (success) {
         toast.success("Success", {
           description: "Car removed from cart successfully",
         });
@@ -103,7 +104,7 @@ const Page = () => {
             <TableFooter>
               <TableRow>
                 <TableCell colSpan={5}>Total</TableCell>
-                <TableCell>$2,500.00</TableCell>
+                <TableCell>{cart.totalPrice}</TableCell>
               </TableRow>
             </TableFooter>
           </Table>
@@ -120,22 +121,22 @@ const Page = () => {
               <div className="flex items-center justify-between">
                 <h6 className="text-sm dark:text-neutral-200">Sub total</h6>
                 <p className="text-sm text-gray-500 dark:text-neutral-300">
-                  Ksh 1.2M
+                  {cart.totalPrice}
                 </p>
               </div>
               {/* shipping */}
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <h6 className="text-sm dark:text-neutral-200">Shipping Fee</h6>
                 <p className="text-sm text-gray-500 dark:text-neutral-300">
-                  100,000
+                  {fee}
                 </p>
-              </div>
+              </div> */}
               {/* total */}
               <div className="border-t dark:border-t-neutral-600/10 py-2 mb-4">
                 <div className="flex items-center justify-between">
                   <h6 className="text-sm dark:text-neutral-200">Total</h6>
                   <p className="text-sm text-gray-500 dark:text-neutral-300">
-                    1,300,000
+                    {cart.totalPrice}
                   </p>
                 </div>
               </div>

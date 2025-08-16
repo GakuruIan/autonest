@@ -1,21 +1,52 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 
+// components
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar/Appsidebar";
 import Topbar from "@/components/Topbar/Topbar";
 
+import { useUser } from "@clerk/nextjs";
+
+// loader
+import Loader from "@/components/ui/Loaders/Loader";
+
+// router
+import { useRouter } from "next/navigation";
+
+import { toast } from "sonner";
+
 /*
 TODO:
-  Add Car editting and deleting
-  add admin route protection
+  Add Car editting
   add checkout and stripe payment
 */
 
-const layout = ({
+const Layout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.replace("/login");
+    }
+
+    if (user?.publicMetadata.role !== "admin") {
+      toast.warning("Unauthorized access", {
+        description:
+          "You are trying to access information you have no access to",
+      });
+      router.replace("/");
+    }
+  }, [user, isLoaded, isSignedIn, router]);
+
+  if (!isLoaded) {
+    return <Loader />;
+  }
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -28,4 +59,4 @@ const layout = ({
   );
 };
 
-export default layout;
+export default Layout;

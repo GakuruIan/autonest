@@ -1,4 +1,8 @@
-import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import {
+  v2 as cloudinary,
+  DeleteApiResponse,
+  UploadApiResponse,
+} from "cloudinary";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -49,4 +53,41 @@ export const uploadToCloudinary = async (
 
   const results = await Promise.all(uploadPromise);
   return Array.isArray(media) ? results : results[0];
+};
+
+export const DeleteFromCloudinary = async (
+  fileIds: string | string[]
+): Promise<DeleteApiResponse | DeleteApiResponse[]> => {
+  if (!fileIds || (Array.isArray(fileIds) && fileIds.length === 0)) {
+    throw new Error("No file IDs provided for deletion");
+  }
+
+  const ids = Array.isArray(fileIds) ? fileIds : [fileIds];
+
+  const validIds = ids.filter(
+    (id) => id && typeof id === "string" && id.trim().length > 0
+  );
+
+  if (validIds.length === 0) {
+    throw new Error("No valid file IDs provided for deletion");
+  }
+
+  try {
+    if (validIds.length === 1) {
+      const result = await cloudinary.uploader.destroy(validIds[0]);
+
+      return Array.isArray(fileIds) ? [result] : result;
+    } else {
+      const result = await cloudinary.api.delete_resources(validIds);
+
+      return Array.isArray(fileIds)
+        ? validIds.map(
+            (id) => result.deleted[id] || { result: "not found", public_id: id }
+          )
+        : result;
+    }
+  } catch (error) {
+    console.error("Error deleting files from Cloudinary:", error);
+    throw error;
+  }
 };

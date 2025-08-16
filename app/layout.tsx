@@ -13,6 +13,9 @@ import { ReactQueryClientProvider } from "@/providers/ReactQueryProvider";
 // toaster
 import { Toaster } from "@/components/ui/sonner";
 
+// modal provider
+import { ModalProvider } from "@/providers/ModalProvider";
+
 const bebas_neue = Bebas_Neue({
   weight: "400",
   variable: "--font-bebas_neue",
@@ -59,6 +62,7 @@ export default function RootLayout({
               storageKey="autonest-theme"
             >
               {children}
+              <ModalProvider />
               <Toaster richColors={true} position="top-center" />
             </ThemeProvider>
           </body>

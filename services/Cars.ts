@@ -71,3 +71,17 @@ export const FetchFeatured = async () => {
     throw new Error("Unknown error occurred while creating car");
   }
 };
+
+export const DeleteCar = async (id: string) => {
+  try {
+    const res = await api.delete(`/cars/${id}`);
+
+    return res.data;
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("Fetching featured cars error:", err.message);
+      throw err;
+    }
+    throw new Error("Unknown error occurred while creating car");
+  }
+};

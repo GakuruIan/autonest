@@ -11,18 +11,29 @@ import { MoreHorizontal, Copy, Eye, Trash, Edit } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogTitle,
+  DialogHeader,
+  DialogFooter,
+  DialogContent,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
+
 import Image from "next/image";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+// toast
+import { toast } from "sonner";
+import { useModal } from "@/hooks/use-modal-store";
 
 export type CarProps = Pick<
   Car,
@@ -97,6 +108,7 @@ export const columns: ColumnDef<CarProps>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const car = row.original;
+      const { onOpen } = useModal();
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -108,19 +120,25 @@ export const columns: ColumnDef<CarProps>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(car.id)}
+              onClick={() => {
+                navigator.clipboard.writeText(car.id);
+                toast.success("Car ID copied");
+              }}
             >
               <Copy /> Copy car ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+
             <DropdownMenuItem>
               <Edit /> Edit car
             </DropdownMenuItem>
+
             <DropdownMenuItem>
               <Eye /> View car details
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => onOpen("DeleteCar", { car })}>
               <Trash /> Delete car
             </DropdownMenuItem>
           </DropdownMenuContent>

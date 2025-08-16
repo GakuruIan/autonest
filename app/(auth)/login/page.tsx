@@ -65,7 +65,7 @@ const Page = () => {
 
   useEffect(() => {
     if (isSignedIn) {
-      router.replace("/dashboard");
+      router.replace("/");
     }
   }, [isSignedIn, router]);
 

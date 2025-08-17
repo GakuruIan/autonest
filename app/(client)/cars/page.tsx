@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Form,
@@ -19,12 +19,33 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import CarCard from "@/components/ui/CarCard";
+import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/Loaders/Loader";
+import Spinner from "@/components/ui/Loaders/Spinner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverAnchor,
+} from "@/components/ui/popover";
 
 // fetch hook
 import { useFetchCars } from "@/hooks/queries/useFetchCars";
-import Loader from "@/components/ui/Loaders/Loader";
 
+//car suggestion hook
+import { useFetchCarSuggestions } from "@/hooks/queries/useFetchCarSuggestions";
+
+// debounce hook
+import { useDebounce } from "@/hooks/useDebounce";
+
+// prisma car type
 import { Car } from "@prisma/client";
+
+import Link from "next/link";
+
+// icons
+import { Search, SlidersHorizontal } from "lucide-react";
+
+import { useSearchParams } from "next/navigation";
 
 type CarProps = Pick<Car, "id" | "brand" | "category" | "price" | "model"> & {
   thumbnail: {
@@ -32,8 +53,20 @@ type CarProps = Pick<Car, "id" | "brand" | "category" | "price" | "model"> & {
   };
 };
 
-const Page = ({ searchParams }: { searchParams: { category?: string } }) => {
-  const category = searchParams.category;
+const Page = () => {
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category");
+
+  const [search, setSearch] = useState("");
+
+  const debouncedSearch = useDebounce(search, 600);
+
+  const { data: suggestions, isLoading: suggestionLoading } =
+    useFetchCarSuggestions(debouncedSearch);
+
+  if (!suggestionLoading) {
+    console.log(suggestions);
+  }
 
   const searchSchema = z.object({
     search_term: z
@@ -78,26 +111,74 @@ const Page = ({ searchParams }: { searchParams: { category?: string } }) => {
         </header>
 
         {/* search form */}
-        <div className="py-2">
+        <div className="py-2 relative">
           <Form {...form}>
-            <form action="">
-              <FormField
-                control={form.control}
-                name="search_term"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        placeholder="What type of car are you interested in?"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <form>
+              <div className="flex items-center gap-x-1.5 ">
+                <FormField
+                  control={form.control}
+                  name="search_term"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input
+                          placeholder="What type of car are you interested in?"
+                          {...field}
+                          value={search}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setSearch(e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex items-center gap-x-1">
+                  <Button type="button" variant="outline">
+                    <SlidersHorizontal />
+                  </Button>
+                </div>
+              </div>
             </form>
           </Form>
+
+          <Popover open={debouncedSearch.length > 0}>
+            <PopoverAnchor asChild>
+              <div />
+            </PopoverAnchor>
+            <PopoverContent
+              className="p-1.5 mt-2 w-[var(--radix-popover-trigger-width)]"
+              side="bottom"
+              align="start"
+            >
+              {suggestionLoading ? (
+                <div className="flex justify-center p-2">
+                  <Spinner size="xs" />
+                </div>
+              ) : suggestions?.length ? (
+                <div className="flex flex-col gap-2">
+                  {suggestions.map((car: CarProps) => (
+                    <Link
+                      key={car.id}
+                      href={`/cars/${car.id}`}
+                      className="px-3 flex items-center gap-x-3 py-2 hover:bg-accent rounded-md transition"
+                    >
+                      <span className="text-base ">{car.model}</span>
+                      <span className="font-sm text-muted-foreground">
+                        ({car.brand})
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-center text-muted-foreground p-2">
+                  No results found
+                </p>
+              )}
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="flex items-center gap-x-2">

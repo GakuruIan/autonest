@@ -201,25 +201,114 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
-    const category = searchParams.get("category") || undefined;
 
-    const cars = await db.car.findMany({
-      where: {
-        category: category ? (category as $Enums.CarCategory) : {},
-      },
-      select: {
-        price: true,
-        model: true,
-        brand: true,
-        category: true,
-        id: true,
-        thumbnail: {
-          select: {
-            url: true,
+    // Extract all filter parameters
+    const category = searchParams.get("category") || undefined;
+    const sort = searchParams.get("sort") || "newest";
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+
+    const user = await currentUser();
+
+    const whereClause: any = {};
+
+    // Category filter
+    if (category) {
+      whereClause.category = category as $Enums.CarCategory;
+    }
+
+    // Price range filters
+    if (minPrice || maxPrice) {
+      whereClause.price = {};
+
+      if (minPrice) {
+        const minPriceNum = parseFloat(minPrice);
+        if (!isNaN(minPriceNum)) {
+          whereClause.price.gte = minPriceNum;
+        }
+      }
+
+      if (maxPrice) {
+        const maxPriceNum = parseFloat(maxPrice);
+        if (!isNaN(maxPriceNum)) {
+          whereClause.price.lte = maxPriceNum;
+        }
+      }
+    }
+
+    let orderBy: any = { createdAt: "desc" };
+
+    switch (sort) {
+      case "newest":
+        orderBy = { createdAt: "desc" };
+        break;
+      case "oldest":
+        orderBy = { createdAt: "asc" };
+        break;
+      default:
+        orderBy = { createdAt: "desc" };
+    }
+
+    let cars;
+
+    if (user) {
+      cars = await db.car.findMany({
+        where: whereClause,
+        orderBy,
+        select: {
+          price: true,
+          model: true,
+          brand: true,
+          category: true,
+          id: true,
+          createdAt: true,
+          thumbnail: {
+            select: {
+              url: true,
+            },
+          },
+          savedBy: {
+            where: {
+              userId: user.id,
+            },
+            select: {
+              id: true,
+            },
           },
         },
-      },
-    });
+      });
+
+      cars = cars.map((car) => ({
+        ...car,
+        isSaved: car.savedBy.length > 0,
+        savedBy: undefined,
+        createdAt: undefined,
+      }));
+    } else {
+      cars = await db.car.findMany({
+        where: whereClause,
+        orderBy,
+        select: {
+          price: true,
+          model: true,
+          brand: true,
+          category: true,
+          id: true,
+          createdAt: true,
+          thumbnail: {
+            select: {
+              url: true,
+            },
+          },
+        },
+      });
+
+      cars = cars.map((car) => ({
+        ...car,
+        isSaved: false,
+        createdAt: undefined,
+      }));
+    }
 
     return NextResponse.json(cars);
   } catch (error) {

@@ -28,22 +28,6 @@
 //   rating: number;
 // }
 
-// export interface CartItem extends Car {
-//   quantity: number;
-// }
-
-// export interface UserInfo {
-//   name: string;
-//   email: string;
-// }
-
-// export interface CarFilters {
-//   priceRange: [number, number];
-//   brands: string[];
-//   categories: string[];
-//   searchTerm: string;
-// }
-
 export interface FeaturedCar {
   id: string;
   price: number;
@@ -51,4 +35,15 @@ export interface FeaturedCar {
     url: string;
   };
   model: string;
+}
+
+export interface Car {
+  id: string;
+  thumbnail: {
+    url: string;
+  };
+  model: string;
+  brand: string;
+  category: string;
+  price: number;
 }

@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/Loaders/Loader";
@@ -24,7 +25,6 @@ import { useRemoveFromCart } from "@/hooks/mutations/useRemoveFromCart";
 import { toast } from "sonner";
 
 const Page = () => {
-  const fee = 100000;
   const { isLoading, data: cart, error } = useFetchCart();
 
   const removeItem = useRemoveFromCart();
@@ -50,7 +50,6 @@ const Page = () => {
     }
   };
 
-  console.log(cart);
   return (
     <div className="flex flex-col space-y-6 container mx-auto py-6 px-2 md:px-0">
       <header className="">

@@ -3,9 +3,16 @@ import React from "react";
 import Image from "next/image";
 
 // icons
-import { Heart } from "lucide-react";
-import { Button } from "./button";
+import { HeartPlus } from "lucide-react";
+
 import Link from "next/link";
+
+// util function
+import { cn } from "@/lib/utils";
+
+// hooks
+import { useAddToWishList } from "@/hooks/mutations/useAddToWishList";
+import { useRemoveFromWishlist } from "@/hooks/mutations/useRemoveFromWishlist";
 
 interface props {
   id: string;
@@ -14,6 +21,7 @@ interface props {
   brand: string;
   category: string;
   price: number;
+  isSaved: boolean;
 }
 
 const CarCard: React.FC<props> = ({
@@ -23,14 +31,33 @@ const CarCard: React.FC<props> = ({
   brand,
   category,
   price,
+  isSaved,
 }) => {
+  const addToWishlistMutation = useAddToWishList();
+  const removeFromWishlistMutation = useRemoveFromWishlist();
+
+  const handleWishList = async () => {
+    if (!isSaved) {
+      await addToWishlistMutation.mutateAsync(id);
+    } else {
+      await removeFromWishlistMutation.mutateAsync(id);
+    }
+  };
+
   return (
     <div className="hover-card w-full rounded-xl overflow-hidden border dark:border-neutral-500/20 flex flex-col shadow-md">
       {/* Image section with heart icon */}
       <div className="relative h-44 overflow-hidden">
         <Image src={image} alt={model} fill className="image-hover" />
-        <button className="cursor-pointer absolute top-3 right-3 backdrop-blur-md bg-white/30 dark:bg-neutral-900/30 p-2 rounded-full shadow hover:scale-105 transition">
-          <Heart size={18} />
+        <button
+          onClick={handleWishList}
+          className="cursor-pointer absolute top-3 right-3 backdrop-blur-md bg-white/30 dark:bg-neutral-100/20 p-2 rounded-full shadow hover:scale-105 transition"
+        >
+          <HeartPlus
+            size={18}
+            fill={isSaved ? "red" : "white"}
+            className={cn(isSaved ? "text-rose-600" : "text-white")}
+          />
         </button>
       </div>
 
@@ -40,7 +67,9 @@ const CarCard: React.FC<props> = ({
           <h3 className="text-base font-semibold dark:text-neutral-300">
             {model}
           </h3>
-          <p className="text-sm dark:text-neutral-300">{price}</p>
+          <p className="text-sm dark:text-neutral-300">
+            {price.toLocaleString()}
+          </p>
         </div>
         <p className="text-sm text-gray-500 dark:text-neutral-300">
           {brand} • <Link href={`/cars?category=${category}`}>{category}</Link>

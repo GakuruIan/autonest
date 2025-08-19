@@ -10,11 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-import Spinner from "@/components/ui/Loaders/Spinner";
-
 import Image from "next/image";
-
-import { useFetchFeaturedCars } from "@/hooks/queries/useFetchFeatured";
 
 import { FeaturedCar } from "@/types/types";
 
@@ -56,7 +52,7 @@ const Featured: React.FC<props> = ({ FeaturedCars }) => {
                 <div className="flex items-center justify-between px-1">
                   <h2 className="text-base dark:text-white">{car.model}</h2>
                   <h2 className="text-base dark:text-neutral-400">
-                    Ksh {car.price}
+                    Ksh {car.price.toLocaleString()}
                   </h2>
                 </div>
               </div>

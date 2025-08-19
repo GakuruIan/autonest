@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 // icons
-import { Search, ShoppingCart, MenuIcon } from "lucide-react";
+import { Search, ShoppingCart, MenuIcon, Heart } from "lucide-react";
 
 // routing
 import Link from "next/link";
@@ -185,24 +185,34 @@ const Navbar = () => {
           </NavigationMenu>
         </nav>
 
-        <div className="hidden md:flex items-center space-x-2">
-          <Button variant="link">
-            <Search />
-          </Button>
-
-          <div className="ml-2">
+        <div className="hidden md:flex items-center space-x-4">
+          <div className="">
             <ThemeToggle />
           </div>
 
           {isSignedIn ? (
-            <div className="flex items-center gap-x-2">
-              <Link href="/cart">
-                <Button variant="link">
-                  <ShoppingCart />
-                </Button>
+            <>
+              <Link href="/cart" className="hover:cursor-pointer ">
+                <ShoppingCart size={16} />
               </Link>
+
+              <Link href="/wishlist" className="hover:cursor-pointer">
+                <Heart size={16} />
+              </Link>
+
+              {isAdmin && (
+                <Button asChild variant="outline" className="py-1" size="sm">
+                  <Link
+                    href="/admin"
+                    className="text-xs tracking-wide hover:underline dark:text-neutral-300 "
+                  >
+                    Dashboard
+                  </Link>
+                </Button>
+              )}
+
               <UserButton />
-            </div>
+            </>
           ) : (
             <>
               <Link
@@ -211,15 +221,6 @@ const Navbar = () => {
               >
                 Login
               </Link>
-
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="text-sm hover:underline dark:text-neutral-300 mx-2"
-                >
-                  Admin
-                </Link>
-              )}
             </>
           )}
         </div>

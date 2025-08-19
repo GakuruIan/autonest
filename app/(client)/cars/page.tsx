@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   Form,
@@ -28,6 +28,19 @@ import {
   PopoverAnchor,
 } from "@/components/ui/popover";
 
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 // fetch hook
 import { useFetchCars } from "@/hooks/queries/useFetchCars";
 
@@ -43,30 +56,37 @@ import { Car } from "@prisma/client";
 import Link from "next/link";
 
 // icons
-import { Search, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 type CarProps = Pick<Car, "id" | "brand" | "category" | "price" | "model"> & {
   thumbnail: {
     url: string;
   };
+  isSaved: boolean;
 };
 
 const Page = () => {
   const searchParams = useSearchParams();
-  const category = searchParams.get("category");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const [search, setSearch] = useState("");
+
+  const category = searchParams.get("category");
+  const sortFromUrl = searchParams.get("sort");
+  const minPriceFromUrl = searchParams.get("minPrice");
+  const maxPriceFromUrl = searchParams.get("maxPrice");
+
+  const [sortBy, setSortBy] = useState(sortFromUrl || "newest");
+  const [minPrice, setMinPrice] = useState(minPriceFromUrl || "");
+  const [maxPrice, setMaxPrice] = useState(maxPriceFromUrl || "");
 
   const debouncedSearch = useDebounce(search, 600);
 
   const { data: suggestions, isLoading: suggestionLoading } =
     useFetchCarSuggestions(debouncedSearch);
-
-  if (!suggestionLoading) {
-    console.log(suggestions);
-  }
 
   const searchSchema = z.object({
     search_term: z
@@ -83,7 +103,20 @@ const Page = () => {
     },
   });
 
-  const { isLoading, data: cars, error } = useFetchCars(category);
+  const filters = {
+    category,
+    sort: sortFromUrl,
+    minPrice: minPriceFromUrl,
+    maxPrice: maxPriceFromUrl,
+  };
+
+  const { isLoading, data: cars, error } = useFetchCars(filters);
+
+  useEffect(() => {
+    setSortBy(sortFromUrl || "newest");
+    setMinPrice(minPriceFromUrl || "");
+    setMaxPrice(maxPriceFromUrl || "");
+  }, [sortFromUrl, minPriceFromUrl, maxPriceFromUrl]);
 
   if (isLoading) {
     return <Loader />;
@@ -96,6 +129,37 @@ const Page = () => {
       </div>
     );
   }
+
+  const applyFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (category) {
+      params.set("category", category);
+    } else {
+      params.delete("category");
+    }
+
+    // Update or remove filter params
+    if (sortBy && sortBy !== "newest") {
+      params.set("sort", sortBy);
+    } else {
+      params.delete("sort");
+    }
+
+    if (minPrice) {
+      params.set("minPrice", minPrice);
+    } else {
+      params.delete("minPrice");
+    }
+
+    if (maxPrice) {
+      params.set("maxPrice", maxPrice);
+    } else {
+      params.delete("maxPrice");
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <div className="container mx-auto py-6 px-2 md:px-0">
@@ -136,9 +200,76 @@ const Page = () => {
                   )}
                 />
                 <div className="flex items-center gap-x-1">
-                  <Button type="button" variant="outline">
-                    <SlidersHorizontal />
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button type="button" variant="outline">
+                        <SlidersHorizontal />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Filters</DialogTitle>
+                        <DialogDescription>
+                          choose filters to apply
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      <div className="mb-2">
+                        <h1 className="font-medium text-sm dark:text-neutral-300 text-gray-500 mb-2">
+                          Sort by
+                        </h1>
+                        <div className="">
+                          <RadioGroup
+                            value={sortBy}
+                            onValueChange={setSortBy}
+                            defaultValue="newest"
+                          >
+                            <div className="flex items-center gap-3">
+                              <RadioGroupItem value="newest" id="r1" />
+                              <Label htmlFor="r1">Newest first</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <RadioGroupItem value="oldest" id="r2" />
+                              <Label htmlFor="r2">Oldest first</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      </div>
+
+                      <div className="mb-2">
+                        <h1 className="font-medium text-sm dark:text-neutral-300 text-gray-500 mb-2">
+                          Price range
+                        </h1>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="">
+                            <Label className="mb-2">Minimum price</Label>
+                            <Input
+                              placeholder="minimum price"
+                              value={minPrice}
+                              onChange={(e) => setMinPrice(e.target.value)}
+                              type="text"
+                            />
+                          </div>
+                          <div className="">
+                            <Label className="mb-2">Maximum price</Label>
+                            <Input
+                              placeholder="maximum price"
+                              value={maxPrice}
+                              onChange={(e) => setMaxPrice(e.target.value)}
+                              type="text"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button onClick={applyFilters}>Apply Filters</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </form>
@@ -182,12 +313,26 @@ const Page = () => {
         </div>
 
         <div className="flex items-center gap-x-2">
-          <h6 className="text-base font-medium font-poppins">Popular:</h6>
+          <h6 className="text-base font-medium font-poppins">
+            Popular category:
+          </h6>
           {/* popular  */}
           <div className="flex items-center gap-x-4">
-            <Badge variant="outline">Mark X</Badge>
-            <Badge variant="outline">Rav 4</Badge>
-            <Badge variant="outline">Madza cx5</Badge>
+            <Badge variant="outline" asChild>
+              <Link href="/cars">All</Link>
+            </Badge>
+            <Badge variant="outline" asChild>
+              <Link href="/cars?category=luxury">Luxury</Link>
+            </Badge>
+            <Badge variant="outline" asChild>
+              <Link href="/cars?category=hatchback">Hatch back</Link>
+            </Badge>
+            <Badge variant="outline" asChild>
+              <Link href="/cars?category=sedan">Sedan</Link>
+            </Badge>
+            <Badge variant="outline" asChild>
+              <Link href="/cars?category=suv">SUV</Link>
+            </Badge>
           </div>
         </div>
 
@@ -203,6 +348,7 @@ const Page = () => {
                 category={car.category}
                 brand={car.brand}
                 image={car.thumbnail.url}
+                isSaved={car.isSaved}
               />
             );
           })}

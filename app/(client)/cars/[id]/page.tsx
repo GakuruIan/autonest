@@ -19,19 +19,30 @@ import { useParams } from "next/navigation";
 // toast
 import { toast } from "sonner";
 
+type relatedProps = {
+  id: string;
+  model: string;
+  thumbnail: {
+    url: string;
+  };
+  price: string;
+};
+
 const CarDetails = () => {
   const [selectedImage, setSelectedImage] = useState(carImages[0]);
 
   const params = useParams();
   const id = params?.id as string | undefined;
 
-  const { data: car, isLoading, error } = useFetchCar(id);
+  const { data, isLoading, error } = useFetchCar(id);
 
   const addToCartMutation = useAddToCart();
 
   if (isLoading) {
     return <Loader />;
   }
+
+  const { car, related } = data;
 
   // adding item to cart
   const handleAddToCart = async (id: string) => {
@@ -89,7 +100,7 @@ const CarDetails = () => {
           <div>
             <h1 className="text-3xl font-medium font-poppins">{car.model}</h1>
             <p className="text-gray-600 dark:text-neutral-400 text-lg mt-1">
-              KSH {car.price} or Financing Available
+              KSH {car.price.toLocaleString()} or Financing Available
             </p>
           </div>
 
@@ -156,14 +167,16 @@ const CarDetails = () => {
       <div className="col-span-2 mt-10">
         <h2 className="text-xl font-medium font-poppins mb-4">Related Cars</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          {[1, 2].map((i) => (
-            <div className="" key={i}>
+          {related.map((car: relatedProps) => (
+            <div className="" key={car.id}>
               <div className="w-full h-44 relative mb-2.5 overflow-hidden rounded-md">
-                <Image src="/bmw2.jpg" fill alt="photo name" />
+                <Image src={car.thumbnail.url} fill alt="photo name" />
               </div>
               <div className="flex items-center justify-between">
-                <h1 className="text-lg dark:text-white">Car name</h1>
-                <p className="text-sm dark:text-neutral-300">ksh 12000</p>
+                <h1 className="text-lg dark:text-white">{car.model}</h1>
+                <p className="text-sm dark:text-neutral-300">
+                  ksh {car.price.toLocaleString()}
+                </p>
               </div>
             </div>
           ))}

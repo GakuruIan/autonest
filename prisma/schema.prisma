@@ -35,16 +35,17 @@ enum CarCategory {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  clerkId   String   @unique
-  username  String?  @unique
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  email     String     @unique
+  clerkId   String     @unique
+  username  String?    @unique
   avatar    String
-  role      Role     @default(user)
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  car       Car[]    @relation("UserCars")
+  role      Role       @default(user)
+  verified  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  car       Car[]      @relation("UserCars")
+  saves     Wishlist[]
   cart      Cart?
 }
 
@@ -64,6 +65,8 @@ model Car {
   description    String
   features       String[]
   in_stock       Boolean
+  views          Int            @default(0)
+  savedBy        Wishlist[]
   rating         Float
   ownerId        String         @db.ObjectId
   owner          User           @relation("UserCars", fields: [ownerId], references: [id])
@@ -101,6 +104,17 @@ model CartItem {
   sold     Boolean @default(false)
 
   @@unique([cartId, carId])
+}
+
+model Wishlist {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  carId  String @db.ObjectId
+
+  car  Car  @relation(fields: [carId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, carId])
 }
 
 type Specifications {

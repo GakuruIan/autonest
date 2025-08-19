@@ -1,10 +1,11 @@
 import { api } from "@/lib/axios";
 
-// type CarData = Omit<
-//   Car,
-//   "id" | "createdAt" | "updatedAt" | "owner" | "thumbnailId" | "ownerId"
-// >;
-
+interface filtersProps {
+  category?: string | null;
+  sort?: string | null;
+  minPrice?: string | null;
+  maxPrice?: string | null;
+}
 // Adding car to database
 export const createCar = async (data: FormData): Promise<void> => {
   try {
@@ -28,10 +29,17 @@ export const createCar = async (data: FormData): Promise<void> => {
   }
 };
 
-export const FetchCars = async (category?: string) => {
+export const FetchCars = async (filters: filtersProps) => {
   try {
+    const params = new URLSearchParams();
+
+    if (filters.category) params.append("category", filters.category);
+    if (filters.sort) params.append("sort", filters.sort);
+    if (filters.minPrice) params.append("minPrice", filters.minPrice);
+    if (filters.maxPrice) params.append("maxPrice", filters.maxPrice);
+
     const res = await api.get("/cars", {
-      params: category ? { category } : {},
+      params: Object.fromEntries(params),
     });
 
     return res.data;
@@ -99,5 +107,47 @@ export const FetchSuggestions = async (search: string) => {
       throw err;
     }
     throw new Error("Unknown error occurred while creating car");
+  }
+};
+
+export const AddToWishList = async (carId: string) => {
+  try {
+    const res = await api.post("/wishlist", { carId });
+
+    return res.data;
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("Saving to wishlist error:", err.message);
+      throw err;
+    }
+    throw new Error("Unknown error occurred while adding car to wishlist");
+  }
+};
+
+export const FetchWishList = async () => {
+  try {
+    const res = await api.get("/wishlist");
+
+    return res.data;
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("Fetching your wishlist error:", err.message);
+      throw err;
+    }
+    throw new Error("Unknown error occurred while fetching your wishlist");
+  }
+};
+
+export const RemoveFromWishlist = async (id: string) => {
+  try {
+    const res = await api.delete(`/wishlist/${id}`);
+
+    return res.data;
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("Deleting your wishlist error error:", err.message);
+      throw err;
+    }
+    throw new Error("Unknown error occurred while deleting car from wishlist");
   }
 };
